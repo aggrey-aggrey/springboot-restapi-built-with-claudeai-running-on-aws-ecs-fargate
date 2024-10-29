@@ -1,64 +1,193 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.3.4</version>
-		<relativePath/> <!-- lookup parent from repository -->
-	</parent>
-	<groupId>io.redcell</groupId>
-	<artifactId>demo</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>demo</name>
-	<description>Demo project created using claude-ai</description>
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<!-- Previous configuration remains the same until profiles section -->
 
-	<properties>
-		<java.version>17</java.version>
-		<mysql.version>8.0.28</mysql.version>
-		<lombok.version>1.18.22</lombok.version>
-	</properties>
+	<profiles>
+		<!-- Development Profile -->
+		<profile>
+			<id>dev</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<spring.profiles.active>dev</spring.profiles.active>
+				<terraform.workspace>dev</terraform.workspace>
+				<aws.region>us-west-2</aws.region>
+				<aws.account>development</aws.account>
+				<skip.confirmation>false</skip.confirmation>
+				<db.host>localhost</db.host>
+				<db.port>3306</db.port>
+				<db.name>authors-books-db</db.name>
+				<db.username>dev_user</db.username>
+				<db.password>dev_password</db.password>
+			</properties>
+		</profile>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<version>${lombok.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>${mysql.version}</version>
-			<scope>runtime</scope>
-		</dependency>
-	</dependencies>
+		<!-- Production Profile -->
+		<profile>
+			<id>prod</id>
+			<properties>
+				<spring.profiles.active>prod</spring.profiles.active>
+				<terraform.workspace>prod</terraform.workspace>
+				<aws.region>us-west-2</aws.region>
+				<aws.account>production</aws.account>
+				<skip.confirmation>false</skip.confirmation>
+				<db.host>${env.DB_HOST}</db.host>
+				<db.port>${env.DB_PORT}</db.port>
+				<db.name>${env.DB_NAME}</db.name>
+				<db.username>${env.DB_USERNAME}</db.username>
+				<db.password>${env.DB_PASSWORD}</db.password>
+			</properties>
+		</profile>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<excludes>
-						<exclude>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-						</exclude>
-					</excludes>
-				</configuration>
-			</plugin>
+		<!-- Enhanced Terraform Destroy Profile -->
+		<profile>
+			<id>terraform-destroy</id>
+			<build>
+				<plugins>
+					<!-- Confirmation Plugin -->
+					<plugin>
+						<groupId>org.codehaus.gmaven</groupId>
+						<artifactId>groovy-maven-plugin</artifactId>
+						<version>2.1.1</version>
+						<executions>
+							<execution>
+								<id>confirm-destroy</id>
+								<phase>validate</phase>
+								<goals>
+									<goal>execute</goal>
+								</goals>
+								<configuration>
+									<source>
+										if (!project.properties['skip.confirmation'].toBoolean()) {
+											def env = project.properties['terraform.workspace']
+											def region = project.properties['aws.region']
+											println "⚠️ WARNING: You are about to destroy all resources in:"
+											println "Environment: ${env}"
+											println "Region: ${region}"
+											println ""
+											println "This will destroy:"
+											println "- RDS Database"
+											println "- ECS Cluster and Services"
+											println "- Load Balancer"
+											println "- VPC and related networking"
+											println "- ECR Repository (and all images)"
+											println ""
+											def confirmation = System.console()?.readLine("Type '${env}' to confirm destruction: ")
+											if (confirmation != env) {
+												throw new RuntimeException("Destruction cancelled: Confirmation didn't match")
+											}
+										}
+									</source>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
 
-		</plugins>
-	</build>
+					<!-- AWS Resource Cleanup Plugin -->
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<executions>
+							<!-- Check for running resources -->
+							<execution>
+								<id>check-resources</id>
+								<phase>validate</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>${project.basedir}/../scripts/check-resources.sh</executable>
+									<arguments>
+										<argument>${terraform.workspace}</argument>
+										<argument>${aws.region}</argument>
+									</arguments>
+								</configuration>
+							</execution>
 
+							<!-- Plan destruction -->
+							<execution>
+								<id>terraform-destroy-plan</id>
+								<phase>clean</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>terraform</executable>
+									<workingDirectory>${project.basedir}/../terraform</workingDirectory>
+									<arguments>
+										<argument>plan</argument>
+										<argument>-destroy</argument>
+										<argument>-var-file=environments/${terraform.workspace}/terraform.tfvars</argument>
+										<argument>-var-file=environments/${terraform.workspace}/secrets.tfvars</argument>
+										<argument>-out=tfdestroyplan</argument>
+									</arguments>
+								</configuration>
+							</execution>
+
+							<!-- Execute destruction -->
+							<execution>
+								<id>terraform-destroy</id>
+								<phase>clean</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>terraform</executable>
+									<workingDirectory>${project.basedir}/../terraform</workingDirectory>
+									<arguments>
+										<argument>apply</argument>
+										<argument>tfdestroyplan</argument>
+									</arguments>
+								</configuration>
+							</execution>
+
+							<!-- Verify destruction -->
+							<execution>
+								<id>verify-destruction</id>
+								<phase>clean</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>${project.basedir}/../scripts/verify-destruction.sh</executable>
+									<arguments>
+										<argument>${terraform.workspace}</argument>
+										<argument>${aws.region}</argument>
+									</arguments>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<executions>
+							<!-- Previous executions remain the same -->
+
+							<!-- Initialize Database -->
+							<execution>
+								<id>init-database</id>
+								<phase>process-resources</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>${project.basedir}/../scripts/init-database.sh</executable>
+									<arguments>
+										<argument>${terraform.workspace}</argument>
+									</arguments>
+									<environmentVariables>
+										<DB_USERNAME>${db.username}</DB_USERNAME>
+										<DB_PASSWORD>${db.password}</DB_PASSWORD>
+									</environmentVariables>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>

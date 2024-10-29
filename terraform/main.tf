@@ -15,7 +15,7 @@ provider "aws" {
 module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
 
-  name = "author-book-vpc-${var.environment}"
+  name = "author-books-vpc-${var.environment}"
   cidr = "10.0.0.0/16"
 
   azs              = ["${var.aws_region}a", "${var.aws_region}b"]
@@ -27,13 +27,13 @@ module "vpc" {
 
   tags = {
     Environment = var.environment
-    Project     = "author-book-api"
+    Project     = "author-books-api"
   }
 }
 
 # RDS Instance
 resource "aws_db_instance" "mysql" {
-  identifier        = "author-book-db-${var.environment}"
+  identifier        = "author-books-db-${var.environment}"
   engine            = "mysql"
   engine_version    = "8.0"
   instance_class    = var.environment == "prod" ? "db.t3.medium" : "db.t3.micro"
@@ -51,7 +51,7 @@ resource "aws_db_instance" "mysql" {
 
   tags = {
     Environment = var.environment
-    Project     = "author-book-api"
+    Project     = "author-books-api"
   }
 }
 
@@ -70,7 +70,7 @@ resource "aws_security_group" "rds" {
 
 # ECS Cluster
 resource "aws_ecs_cluster" "main" {
-  name = "author-book-cluster-${var.environment}"
+  name = "author-books-cluster-${var.environment}"
 
   setting {
     name  = "containerInsights"
@@ -89,7 +89,7 @@ resource "aws_ecr_repository" "api" {
 
 # ECS Task Definition
 resource "aws_ecs_task_definition" "api" {
-  family                   = "author-book-api-${var.environment}"
+  family                   = "author-books-api-${var.environment}"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   cpu                     = var.environment == "prod" ? "1024" : "512"
@@ -143,7 +143,7 @@ resource "aws_ecs_task_definition" "api" {
 
 # ECS Service
 resource "aws_ecs_service" "api" {
-  name            = "author-book-api-${var.environment}"
+  name            = "author-books-api-${var.environment}"
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.api.arn
   desired_count   = var.environment == "prod" ? 2 : 1
@@ -163,7 +163,7 @@ resource "aws_ecs_service" "api" {
 
 # Application Load Balancer
 resource "aws_lb" "api" {
-  name               = "author-book-alb-${var.environment}"
+  name               = "author-books-alb-${var.environment}"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb.id]

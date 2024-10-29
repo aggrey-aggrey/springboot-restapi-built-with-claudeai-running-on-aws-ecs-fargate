@@ -4,7 +4,7 @@ terraform {
     key    = "author-books-api/terraform.tfstate"
     region = "us-west-2"
 
-    dynamodb_table = "terraform-state-lock"
+    dynamodb_table = "prod-terraform-state-lock"
     encrypt        = true
   }
 }

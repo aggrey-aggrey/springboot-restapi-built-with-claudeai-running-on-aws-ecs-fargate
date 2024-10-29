@@ -13,7 +13,7 @@ variable "environment" {
 variable "db_name" {
   description = "Database name"
   type        = string
-  default     = "authordb"
+  default     = "author-books-db"
 }
 
 variable "db_username" {
@@ -31,5 +31,5 @@ variable "db_password" {
 variable "ecr_repository_name" {
   description = "Name of the ECR repository"
   type        = string
-  default     = "author-book-api"
+  default     = "author-books-api"
 }
