@@ -189,5 +189,12 @@
 				</plugins>
 			</build>
 		</profile>
+		<profile>
+			<id>local</id>
+			<properties>
+				<spring.profiles.active>local</spring.profiles.active>
+				<skip.terraform>true</skip.terraform>
+			</properties>
+		</profile>
 	</profiles>
 </project>
