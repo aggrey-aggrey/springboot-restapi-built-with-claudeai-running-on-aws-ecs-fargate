@@ -1,3 +1,6 @@
+#!/bin/bash
+# scripts/update-db-config.sh
+
 # Get database endpoint from Terraform output
 DB_ENDPOINT=$(terraform -chdir=terraform output -raw rds_endpoint)
 DB_NAME=$(terraform -chdir=terraform output -raw db_name)
