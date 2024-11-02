@@ -6,7 +6,7 @@ set -e
 # Default local database configuration
 DB_HOST=localhost
 DB_PORT=3306
-DB_NAME=authordb
+DB_NAME=author-books-db
 DB_USERNAME=dev_user
 DB_PASSWORD=dev_password
 MYSQL_ROOT_PASSWORD=root

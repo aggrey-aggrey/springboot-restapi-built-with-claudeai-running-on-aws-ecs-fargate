@@ -40,4 +40,3 @@ if [ "$EXIT_CODE" != "0" ]; then
 else
     echo "✅ All resources were successfully destroyed!"
 fi
-Last edited 2 days ago

@@ -1,42 +1,42 @@
-# Spring Boot
-/spring-boot-api/target/
-!.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+Terraform .gitignore
 
-# IDE
-.idea/
-*.iws
-*.iml
-*.ipr
-.vscode/
-.settings/
-.project
-.classpath
+# terraform/.gitignore
+# Local .terraform directories
+**/.terraform/*
 
-# Terraform
-terraform/.terraform/
-terraform/*.tfstate
-terraform/*.tfstate.*
-terraform/*.tfvars
-terraform/.terraformrc
-terraform/terraform.rc
-terraform/tfplan
-terraform/tfdestroyplan
-terraform/.terraform.lock.hcl
+# .tfstate files
+*.tfstate
+*.tfstate.*
 
-# Environment Variables
+# Crash log files
+crash.log
+crash.*.log
+
+# Secret variable files
+**/secrets.tfvars
+**/secrets.tfvars.json
+
+# Override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# CLI configuration files
+.terraformrc
+terraform.rc
+
+# Lock files
+.terraform.lock.hcl
+
+# Backup files
+*.bak
+
+# Sensitive environment files
 .env
 *.env
 
-# Logs
-logs/
-*.log
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Docker
-*.tar
-*.jar
+# Plan files
+tfplan
+tfplan.*
+*.tfout
