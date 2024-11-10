@@ -1,7 +1,7 @@
 -- Drop database if exists and create new one
 -- DROP DATABASE IF EXISTS author_books;
--- CREATE DATABASE author_books;
-USE author_books;
+-- CREATE DATABASE author_books-db;
+USE author_books-db;
 
 -- Drop tables if they exist
 DROP TABLE IF EXISTS book_authors;

@@ -1,301 +1,71 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.3.4</version>
-		<relativePath/>
-	</parent>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.3.4</version>
+        <relativePath/>
+    </parent>
 
-	<groupId>io.redcell</groupId>
-	<artifactId>demo</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>demo</name>
-	<description>Demo project created using claude-ai</description>
+    <groupId>io.redcell</groupId>
+    <artifactId>demo</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>demo</name>
+    <description>Demo project created using claude-ai</description>
 
-	<properties>
-		<!-- Core Properties -->
-		<java.version>17</java.version>
-		<mysql.version>8.0.28</mysql.version>
-		<lombok.version>1.18.22</lombok.version>
+    <properties>
+        <!-- Core Properties -->
+        <java.version>17</java.version>
+        <mysql.version>8.0.28</mysql.version>
+        <lombok.version>1.18.22</lombok.version>
 
-		<!-- Environment Properties -->
-		<terraform.workspace>default</terraform.workspace>
-		<skip.terraform.confirmation>false</skip.terraform.confirmation>
+    </properties>
 
-		<!-- Plugin Versions -->
-		<exec-maven-plugin.version>3.1.0</exec-maven-plugin.version>
-		<groovy-maven-plugin.version>2.1.1</groovy-maven-plugin.version>
+    <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.27</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
-		<!-- Testing Properties -->
-		<skipTests>false</skipTests>
-		<skipIntegrationTests>false</skipIntegrationTests>
-
-		<!-- Security Properties -->
-		<skip.security.check>false</skip.security.check>
-	</properties>
-
-	<dependencies>
-		<!-- Spring Boot Dependencies -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-validation</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-actuator</artifactId>
-		</dependency>
-
-		<!-- Database -->
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>${mysql.version}</version>
-			<scope>runtime</scope>
-		</dependency>
-
-		<!-- Utils -->
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<version>${lombok.version}</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<!-- Testing Dependencies -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
-
-	<build>
-		<resources>
-			<!-- Filter application properties -->
-			<resource>
-				<directory>src/main/resources</directory>
-				<filtering>true</filtering>
-				<includes>
-					<include>application*.properties</include>
-				</includes>
-			</resource>
-			<resource>
-				<directory>src/main/resources</directory>
-				<filtering>false</filtering>
-				<excludes>
-					<exclude>application*.properties</exclude>
-				</excludes>
-			</resource>
-		</resources>
-
-		<plugins>
-			<!-- Spring Boot Maven Plugin -->
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<excludes>
-						<exclude>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-						</exclude>
-					</excludes>
-					<layers>
-						<enabled>true</enabled>
-					</layers>
-				</configuration>
-			</plugin>
-
-			<!-- Terraform Maven Plugin -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<version>${exec-maven-plugin.version}</version>
-				<executions>
-					<!-- Initialize Terraform -->
-					<execution>
-						<id>terraform-init</id>
-						<phase>initialize</phase>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-						<configuration>
-							<executable>terraform</executable>
-							<workingDirectory>${project.basedir}/../terraform</workingDirectory>
-							<arguments>
-								<argument>init</argument>
-								<argument>-backend-config=environments/${terraform.workspace}/backend.tfvars</argument>
-								<argument>-reconfigure</argument>
-							</arguments>
-							<skip>${skip.terraform}</skip>
-						</configuration>
-					</execution>
-
-					<!-- Plan Terraform Changes -->
-					<execution>
-						<id>terraform-plan</id>
-						<phase>generate-resources</phase>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-						<configuration>
-							<executable>terraform</executable>
-							<workingDirectory>${project.basedir}/../terraform</workingDirectory>
-							<arguments>
-								<argument>plan</argument>
-								<argument>-var-file=environments/${terraform.workspace}/terraform.tfvars</argument>
-								<argument>-var-file=environments/${terraform.workspace}/secrets.tfvars</argument>
-								<argument>-out=tfplan</argument>
-							</arguments>
-							<skip>${skip.terraform}</skip>
-						</configuration>
-					</execution>
-
-					<!-- Apply Terraform Changes -->
-					<execution>
-						<id>terraform-apply</id>
-						<phase>generate-resources</phase>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-						<configuration>
-							<executable>terraform</executable>
-							<workingDirectory>${project.basedir}/../terraform</workingDirectory>
-							<arguments>
-								<argument>apply</argument>
-								<argument>tfplan</argument>
-							</arguments>
-							<skip>${skip.terraform}</skip>
-						</configuration>
-					</execution>
-
-					<!-- Initialize Database -->
-					<execution>
-						<id>init-database</id>
-						<phase>process-resources</phase>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-						<configuration>
-							<executable>${project.basedir}/../scripts/init-database.sh</executable>
-							<arguments>
-								<argument>${terraform.workspace}</argument>
-							</arguments>
-							<environmentVariables>
-								<DB_USERNAME>${db.username}</DB_USERNAME>
-								<DB_PASSWORD>${db.password}</DB_PASSWORD>
-							</environmentVariables>
-							<skip>${skip.terraform}</skip>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-			<!-- Testing plugins -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<configuration>
-					<skipTests>${skipTests}</skipTests>
-				</configuration>
-			</plugin>
-
-			<!-- Security check plugin -->
-			<plugin>
-				<groupId>org.owasp</groupId>
-				<artifactId>dependency-check-maven</artifactId>
-				<version>7.1.1</version>
-				<configuration>
-					<skip>${skip.security.check}</skip>
-					<failBuildOnCVSS>7</failBuildOnCVSS>
-				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>check</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
-
-	<!-- Your existing profiles -->
-	<profiles>
-		<!-- Development Profile -->
-		<profile>
-			<id>dev</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<properties>
-				<spring.profiles.active>dev</spring.profiles.active>
-				<terraform.workspace>dev</terraform.workspace>
-				<aws.region>us-west-2</aws.region>
-				<aws.account>development</aws.account>
-				<skip.confirmation>false</skip.confirmation>
-				<db.host>localhost</db.host>
-				<db.port>3306</db.port>
-				<db.name>authors-books-db</db.name>
-				<db.username>dev_user</db.username>
-				<db.password>dev_password</db.password>
-			</properties>
-		</profile>
-
-		<!-- Production Profile -->
-		<profile>
-			<id>prod</id>
-			<properties>
-				<spring.profiles.active>prod</spring.profiles.active>
-				<terraform.workspace>prod</terraform.workspace>
-				<aws.region>us-west-2</aws.region>
-				<aws.account>production</aws.account>
-				<skip.confirmation>false</skip.confirmation>
-				<db.host>${env.DB_HOST}</db.host>
-				<db.port>${env.DB_PORT}</db.port>
-				<db.name>${env.DB_NAME}</db.name>
-				<db.username>${env.DB_USERNAME}</db.username>
-				<db.password>${env.DB_PASSWORD}</db.password>
-				<skip.security.check>false</skip.security.check>
-			</properties>
-		</profile>
-
-		<!-- Local Profile -->
-		<profile>
-			<id>local</id>
-			<properties>
-				<spring.profiles.active>local</spring.profiles.active>
-				<skip.terraform>true</skip.terraform>
-				<skip.security.check>true</skip.security.check>
-			</properties>
-		</profile>
-
-		<!-- Your existing terraform-destroy profile remains the same -->
-		<!-- Enhanced Terraform Destroy Profile -->
-		<profile>
-			<id>terraform-destroy</id>
-			<build>
-				<plugins>
-					<!-- Your existing terraform-destroy configuration -->
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 </project>
