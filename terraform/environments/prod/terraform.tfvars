@@ -1,4 +1,4 @@
-/** environment     = "prod"
+
 environment = "prod"
 app_name    = "author-books-api"
 aws_region  = "us-west-2"
@@ -13,9 +13,9 @@ container_cpu    = 1024
 container_memory = 2048
 
 # Database Connection (from manually created RDS)
-db_host = "your-prod-rds-endpoint"
+db_host = "author-books-db.D.us-west-2.rds.amazonaws.com"
 db_port = "3306"
-db_name = "your_database_name"
+db_name = "author_books"
 
 tags = {
   Environment = "prod"

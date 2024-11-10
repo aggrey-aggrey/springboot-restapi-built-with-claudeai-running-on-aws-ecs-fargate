@@ -15,7 +15,7 @@ container_cpu    = 1024
 container_memory = 2048
 
 # Database Connection (from manually created RDS)
-db_host = "author-books-db.c.us-west-2.rds.amazonaws.com"
+db_host = "author-books-db.C.us-west-2.rds.amazonaws.com"
 db_port = "3306"
 db_name = "author_books"
 
