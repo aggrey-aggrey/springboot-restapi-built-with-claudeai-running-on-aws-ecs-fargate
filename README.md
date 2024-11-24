@@ -31,21 +31,147 @@ cd spring-boot-api
 mvn spring-boot:run -Pdev
 ```
 
-## Deployment
+## 3. Infrastructure Deployment
 
-1. Configure AWS credentials:
 ```bash
-aws configure
+# Setup AWS backend infrastructure (S3 bucket and DynamoDB for state)
+./scripts/setup-aws.sh dev
+
+# Initialize Terraform with backend
+./scripts/tf.sh dev init
+
+# Plan infrastructure changes
+./scripts/tf.sh dev plan
+
+# Apply infrastructure
+./scripts/tf.sh dev apply
 ```
 
-2. Deploy to development:
+## 4. Application Deployment
 ```bash
-./scripts/deploy.sh dev
+# Build and push Docker image to ECR
+./scripts/docker-build-push.sh dev
+
+# Verify ECS deployment
+./scripts/troubleshooting-ecs.sh
 ```
 
-3. Deploy to production:
+## 5. Verification
 ```bash
-./scripts/deploy.sh prod
+# Test API endpoints
+./scripts/test-api.sh dev
+```
+
+## Common Operations
+
+### Update Application
+```bash
+# Build and deploy new version
+./scripts/docker-build-push.sh dev
+
+# Verify deployment
+./scripts/troubleshooting-ecs.sh
+```
+
+### Infrastructure Changes
+```bash
+# Plan changes
+./scripts/tf.sh dev plan
+
+# Apply changes
+./scripts/tf.sh dev apply
+```
+
+### Resource Cleanup
+```bash
+# Remove all infrastructure (except RDS)
+./scripts/cleanup.sh dev
+```
+
+## Environment-Specific Deployments
+
+### Development Environment
+```bash
+# Deploy to dev
+./scripts/tf.sh dev init
+./scripts/tf.sh dev plan
+./scripts/tf.sh dev apply
+./scripts/docker-build-push.sh dev
+```
+
+### Production Environment
+```bash
+# Deploy to prod
+./scripts/tf.sh prod init
+./scripts/tf.sh prod plan
+./scripts/tf.sh prod apply
+./scripts/docker-build-push.sh prod
+```
+
+## Troubleshooting Steps
+
+### Application Issues
+```bash
+# Check ECS service status
+./scripts/troubleshooting-ecs.sh
+
+# View application logs
+aws logs tail /ecs/author-books-api-dev --follow
+```
+
+### Infrastructure Issues
+```bash
+# Verify current state
+./scripts/tf.sh dev plan
+
+# Apply fixes if needed
+./scripts/tf.sh dev apply
+```
+## Important Notes
+
+1. **Database Management**
+   - Database is managed manually through AWS Console
+   - Keep database credentials secure
+   - Update application properties if database details change
+
+2. **Order of Operations**
+   - Database must be created and configured before application deployment
+   - Infrastructure must be deployed before application
+   - Always verify database connectivity before deploying application
+
+3. **Security Considerations**
+   - Keep secrets.tfvars files secure and never commit to version control
+   - Regularly rotate database passwords
+   - Monitor security group rules
+
+4. **Backup Considerations**
+   - Setup database backups in AWS Console
+   - Consider taking snapshots before major changes
+
+## Complete Deployment Example
+```bash
+# 1. Initial setup
+chmod +x scripts/*
+
+# 2. Create and configure database in AWS Console
+# (Manual step using AWS Console and MySQL client)
+
+# 3. Update environment files with database details
+# Edit: environments/dev/terraform.tfvars
+# Edit: environments/dev/secrets.tfvars
+
+# 4. Deploy infrastructure
+./scripts/setup-aws.sh dev
+./scripts/tf.sh dev init
+./scripts/tf.sh dev plan
+./scripts/tf.sh dev apply
+
+# 5. Deploy application
+./scripts/docker-build-push.sh dev
+./scripts/troubleshooting-ecs.sh
+
+# 6. Verify deployment
+./scripts/test-api.sh dev
 ```
 
 ## Infrastructure
@@ -56,6 +182,8 @@ The infrastructure includes:
 - Application Load Balancer
 - VPC with public/private subnets
 - ECR repository
+- S3
+- Dyanamo DB
 
 ## Testing
 
