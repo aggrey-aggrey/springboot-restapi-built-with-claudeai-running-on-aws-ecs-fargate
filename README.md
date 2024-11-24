@@ -31,6 +31,14 @@ cd spring-boot-api
 mvn spring-boot:run -Pdev
 ```
 
+## Testing
+
+Run tests:
+```bash
+cd spring-boot-api
+mvn test
+```
+
 ## 3. Infrastructure Deployment
 
 ```bash
@@ -184,14 +192,6 @@ The infrastructure includes:
 - ECR repository
 - S3
 - Dyanamo DB
-
-## Testing
-
-Run tests:
-```bash
-cd spring-boot-api
-mvn test
-```
 
 ## License
 
